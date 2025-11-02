@@ -1,0 +1,62 @@
+2025-11-02 10:50:39:297 📃 logger initialized
+2025-11-02 10:50:39:304 🌱 Store init
+2025-11-02 10:50:39:343 🚀 Main process startup
+2025-11-02 10:50:39:454 🚀 Application Process Startup
+2025-11-02 10:50:39:462 📂 Serving static files from /renderer
+2025-11-02 10:50:39:471 (node:25448) [DEP0180] DeprecationWarning: fs.Stats constructor is deprecated.
+(Use `SPlayer --trace-deprecation ...` to show where the warning was created)
+2025-11-02 10:50:39:589 🌐 Register NcmAPI successfully
+2025-11-02 10:50:39:613 🌐 Register UnblockAPI successfully
+2025-11-02 10:50:39:706 🌐 Starting AppServer on port 25884
+2025-11-02 10:50:40:050 🚀 Tray Process Startup
+2025-11-02 10:50:40:280 🚀 ThumbarButtons Startup
+2025-11-02 10:50:40:730 🚀 ThumbarButtons Startup
+2025-11-02 10:50:41:694 🚫 All shortcuts unregistered.
+2025-11-02 10:50:41:695 ✅ Shortcut registered: CmdOrCtrl+Shift+Space
+2025-11-02 10:50:41:696 ✅ Shortcut registered: CmdOrCtrl+Shift+Left
+2025-11-02 10:50:41:697 ✅ Shortcut registered: CmdOrCtrl+Shift+Right
+2025-11-02 10:50:41:698 ✅ Shortcut registered: CmdOrCtrl+Shift+Up
+2025-11-02 10:50:41:700 ✅ Shortcut registered: CmdOrCtrl+Shift+Down
+2025-11-02 10:50:41:700 ✅ Shortcut registered: CmdOrCtrl+Shift+D
+2025-11-02 10:50:41:742 Checking for update
+2025-11-02 10:50:41:812 🌐 Request NcmAPI: login/status
+2025-11-02 10:50:41:830 🌐 Request NcmAPI: search/hot/detail
+2025-11-02 10:50:41:883 🌐 Request NcmAPI: song/url/v1
+2025-11-02 10:50:42:071 🌐 Request NcmAPI: personalized
+2025-11-02 10:50:42:856 🌐 Request NcmAPI: user/account
+2025-11-02 10:50:42:949 🌐 Request NcmAPI: user/detail
+2025-11-02 10:50:42:956 🌐 Request NcmAPI: lyric/new
+2025-11-02 10:50:42:960 🌐 Request NcmAPI: song/chorus
+2025-11-02 10:50:43:094 🌐 Request NcmAPI: song/url/v1
+2025-11-02 10:50:43:233 🌐 Request NcmAPI: playlist/detail
+2025-11-02 10:50:43:236 🌐 Request NcmAPI: playlist/detail
+2025-11-02 10:50:43:291 🌐 Request NcmAPI: playlist/detail
+2025-11-02 10:50:43:369 🔗 KuwoSong URL: http://ro.sycdn.kuwo.cn/6985ec68cf3c70905a282620a732b9c9/6906c714/resource/n2/62/95/2896297369.mp3?bitrate
+2025-11-02 10:50:43:372 🌐 Request NcmAPI: playlist/detail
+2025-11-02 10:50:43:547 🌐 Request NcmAPI: playlist/detail
+2025-11-02 10:50:43:561 🌐 Request NcmAPI: playlist/detail
+2025-11-02 10:50:43:687 🌐 Request NcmAPI: playlist/detail
+2025-11-02 10:50:43:730 🌐 Request NcmAPI: user/subcount
+2025-11-02 10:50:43:961 🌐 Request NcmAPI: likelist
+2025-11-02 10:50:43:965 🌐 Request NcmAPI: user/playlist
+2025-11-02 10:50:43:976 🌐 Request NcmAPI: artist/sublist
+2025-11-02 10:50:43:994 🌐 Request NcmAPI: album/sublist
+2025-11-02 10:50:44:048 🌐 Request NcmAPI: mv/sublist
+2025-11-02 10:50:44:066 🌐 Request NcmAPI: dj/sublist
+2025-11-02 10:50:44:070 🌐 Request NcmAPI: recommend/songs
+2025-11-02 10:50:44:107 🌐 Request NcmAPI: top/artists
+2025-11-02 10:50:44:252 🌐 Request NcmAPI: mv/all
+2025-11-02 10:50:44:394 Update for version 3.0.0-beta.3 is not available (latest version: 3.0.0-beta.3, downgrade is disallowed).
+2025-11-02 10:50:44:395 ✅ No new version available: 3.0.0-beta.3
+2025-11-02 10:50:44:471 🌐 Request NcmAPI: dj/recommend
+2025-11-02 10:50:44:579 🌐 Request NcmAPI: album/new
+2025-11-02 10:50:48:836 🔗 NeteaseSongUrl URL: https://m801.music.126.net/20251102111604/fe8e8c2611a47ccd24a206a59fda689e/jdymusic/obj/wo3DlMOGwrbDjj7DisKw/35977453828/3248/2170/5dea/856c31fd3c27652d9f881298416a0179.flac
+2025-11-02 10:50:51:164 🔗 NeteaseSongUrl URL: https://m701.music.126.net/20251102111607/e0ee70757c80e4867f229af23349c1f2/jdymusic/obj/wo3DlMOGwrbDjj7DisKw/17225469650/2ff3/027a/7856/416b5d0dd0f1f973c88fe4322f285174.flac
+2025-11-02 10:50:54:290 🚫 All shortcuts unregistered.
+2025-11-02 10:50:54:291 ✅ Shortcut registered: CmdOrCtrl+Shift+Space
+2025-11-02 10:50:54:291 ✅ Shortcut registered: CmdOrCtrl+Shift+Left
+2025-11-02 10:50:54:292 ✅ Shortcut registered: CmdOrCtrl+Shift+Right
+2025-11-02 10:50:54:292 ✅ Shortcut registered: CmdOrCtrl+Shift+Up
+2025-11-02 10:50:54:293 ✅ Shortcut registered: CmdOrCtrl+Shift+Down
+2025-11-02 10:50:54:293 ✅ Shortcut registered: CmdOrCtrl+Shift+D
+2025-11-02 10:51:41:205 🌐 Request NcmAPI: search/default

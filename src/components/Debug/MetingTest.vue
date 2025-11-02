@@ -118,7 +118,6 @@ import { runAllTests as runMetingTests, testTencentSearch, testNeteaseSearch, te
 import { runQQMusicLyricTests } from "@/api/test-qqmusic-lyrics";
 import { searchMusic, MetingServer } from "@/api/meting";
 import { getQQMusicLyrics, convertToAppLyricFormat, isValidQQMusicLyricUrl } from "@/utils/qqmusic-lyrics";
-import { testQQMusicLyricDisplay, forceRefreshQQMusicLyrics, getCurrentLyricStatus } from "@/utils/test-qqmusic-lyric-display";
 
 // 状态
 const showDebug = ref(false);
@@ -346,7 +345,7 @@ const testWordLyricSongs = async () => {
     log(`\n🔍 测试歌曲: ${songKeyword}`);
 
     try {
-      const results = await tencentSearch(songKeyword, 1);
+      const results = await searchMusic(songKeyword, MetingServer.Tencent);
       if (!results || results.length === 0) {
         log(`❌ ${songKeyword}: 搜索失败`);
         continue;

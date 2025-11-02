@@ -165,7 +165,7 @@ const smartCombineSearchResults = (
   keyword: string,
   neteaseSongs: SongType[],
   tencentSongs: SongType[],
-  offset: number
+  _offset: number
 ): SongType[] => {
   // 计算匹配分数
   const calculateMatchScore = (song: SongType): number => {

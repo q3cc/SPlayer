@@ -1,8 +1,8 @@
 import { useMusicStore, useSettingStore, useStatusStore } from "@/stores";
-import { parsedLyricsData, parseTTMLToAMLL, parseTTMLToYrc, resetSongLyric, parseYrcData } from "../lyric";
+import { parsedLyricsData, parseTTMLToAMLL, parseTTMLToYrc, resetSongLyric } from "../lyric";
 import { songLyric, songLyricTTML } from "@/api/song";
-import { getQQMusicLyricsAsNeteaseFormat, getQQMusicLyrics, convertToAppLyricFormat, isValidQQMusicLyricUrl, addQQMusicWordLyricParam } from "../qqmusic-lyrics";
-import { parseTTML, parseYrc } from "@applemusic-like-lyrics/lyric";
+import { getQQMusicLyricsAsNeteaseFormat, isValidQQMusicLyricUrl } from "../qqmusic-lyrics";
+import { parseTTML } from "@applemusic-like-lyrics/lyric";
 import { LyricLine } from "@applemusic-like-lyrics/core";
 import { LyricType } from "@/types/main";
 
@@ -55,7 +55,7 @@ export const getLyricData = async (id: number, songData?: any) => {
                 isBG: line.isBG ?? false,
                 isDuet: line.isDuet ?? false,
               })),
-              yrcAMData: neteaseFormat.yrcData.map((line, index, lines) => ({
+              yrcAMData: neteaseFormat.yrcData.map(line => ({
                 words: line.contents?.map(word => ({
                   word: word.content,
                   startTime: word.time * 1000,

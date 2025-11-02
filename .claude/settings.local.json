@@ -4,7 +4,9 @@
       "Bash(npm run dev:*)",
       "Bash(npm run build:*)",
       "Bash(node:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(npm run typecheck:*)",
+      "Bash(git add:*)"
     ],
     "deny": [],
     "ask": []

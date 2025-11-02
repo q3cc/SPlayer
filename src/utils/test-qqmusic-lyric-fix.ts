@@ -35,10 +35,12 @@ export const testQQMusicLyricParsing = async () => {
 
     // 手动创建测试用的fetch函数（模拟网络请求）
     const originalFetch = global.fetch;
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      text: () => Promise.resolve(mockQQMusicLyric),
-    });
+    global.fetch = (() => ({
+  then: () => Promise.resolve({
+    ok: true,
+    text: () => Promise.resolve(mockQQMusicLyric),
+  })
+})) as any;
 
     // 测试歌词转换
     const result = await getQQMusicLyricsAsNeteaseFormat(mockUrl);
