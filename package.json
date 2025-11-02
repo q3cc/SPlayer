@@ -30,7 +30,17 @@
     "build:unpack": "npm run build && electron-builder --dir",
     "build:win": "npm run build && electron-builder --win --config electron-builder.config.ts",
     "build:mac": "npm run build && electron-builder --mac --config electron-builder.config.ts",
-    "build:linux": "npm run build && electron-builder --linux --config electron-builder.config.ts"
+    "build:linux": "npm run build && electron-builder --linux --config electron-builder.config.ts",
+    "dist:win": "npm run build && electron-builder --win --publish=never --config electron-builder.config.ts",
+    "dist:mac": "npm run build && electron-builder --mac --publish=never --config electron-builder.config.ts",
+    "dist:linux": "npm run build && electron-builder --linux --publish=never --config electron-builder.config.ts",
+    "dist": "electron-builder --publish=never --config electron-builder.config.ts",
+    "release": "electron-builder --publish=always --config electron-builder.config.ts",
+    "release:patch": "node scripts/release.js patch",
+    "release:minor": "node scripts/release.js minor",
+    "release:major": "node scripts/release.js major",
+    "release:custom": "node scripts/release.js",
+    "check-version": "node scripts/check-version.js"
   },
   "dependencies": {
     "@applemusic-like-lyrics/core": "^0.1.3",

@@ -1,0 +1,242 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ main, dev ]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18'
+  CACHE_VERSION: v1
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Run type checking
+        run: npm run type-check
+        continue-on-error: true
+
+  build-windows:
+    name: Build Windows EXE
+    runs-on: windows-latest
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Build application
+        run: |
+          npm run build
+          npm run build:win
+
+      - name: Package as EXE
+        run: npm run dist:win
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-exe
+          path: |
+            dist/*.exe
+            dist/*.zip
+          retention-days: 30
+
+  build-docker:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    outputs:
+      image-digest: ${{ steps.build.outputs.digest }}
+      image-tag: ${{ steps.meta.outputs.tags }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            splayer/splayer
+            ghcr.io/${{ github.repository }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          platforms: linux/amd64,linux/arm64
+          push: ${{ startsWith(github.ref, 'refs/tags/') }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          outputs: type=registry
+
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [test, build-windows, build-docker]
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-exe
+          path: ./artifacts
+
+      - name: Extract version
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          cat > release_notes.md << EOF
+          # SPlayer ${{ steps.version.outputs.VERSION }}
+
+          ## 🎵 新版本发布
+
+          ### 📦 下载
+          - **Windows EXE**: 适用于Windows 10/11的桌面应用
+          - **Docker镜像**: 适用于服务器部署
+
+          ### 🐳 Docker 部署
+          ```bash
+          # 使用Docker Hub镜像
+          docker run -d \
+            --name splayer \
+            -p 3000:3000 \
+            -v /path/to/music:/app/music \
+            splayer/splayer:latest
+
+          # 或使用GitHub镜像
+          docker run -d \
+            --name splayer \
+            -p 3000:3000 \
+            -v /path/to/music:/app/music \
+            ghcr.io/${{ github.repository }}:latest
+          ```
+
+          ### 🚀 功能特性
+          - 🎵 支持网易云音乐和QQ音乐双源
+          - 🎭 逐字歌词显示
+          - 🌍 多语言界面
+          - 📱 响应式设计
+          - 🎨 自定义主题
+
+          ---
+
+          **SHA256 Checksums**
+          EOF
+
+          # 添加文件校验和
+          cd ./artifacts
+          for file in *; do
+            if [ -f "$file" ]; then
+              sha256sum "$file" >> ../release_notes.md
+            fi
+          done
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: SPlayer ${{ steps.version.outputs.VERSION }}
+          body_path: release_notes.md
+          draft: false
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') || contains(github.ref_name, 'rc') }}
+          files: |
+            ./artifacts/*
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  update-docker-readme:
+    name: Update Docker Hub README
+    runs-on: ubuntu-latest
+    needs: create-release
+    if: startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Update Docker Hub README
+        uses: peter-evans/dockerhub-description@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: splayer/splayer
+          readme-filepath: ./docker/README.md
+          short-description: "🎵 SPlayer - 一个现代化的音乐播放器，支持网易云和QQ音乐双源"
+
+  notify:
+    name: Notify Completion
+    runs-on: ubuntu-latest
+    needs: [create-release]
+    if: always() && startsWith(github.ref, 'refs/tags/')
+    steps:
+      - name: Send notification
+        run: |
+          if [ "${{ needs.create-release.result }}" == "success" ]; then
+            echo "✅ SPlayer ${{ github.ref_name }} 发布成功！"
+          else
+            echo "❌ SPlayer ${{ github.ref_name }} 发布失败！"
+          fi

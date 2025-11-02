@@ -3,6 +3,14 @@
     <div class="title">
       <n-text class="keyword">{{ searchKeyword }}</n-text>
       <n-text depth="3">的相关搜索</n-text>
+      <!-- 音乐源选择 -->
+      <div class="source-selector">
+        <n-radio-group v-model:value="musicSource" size="small" @update:value="sourceChange">
+          <n-radio-button value="netease"> 网易云音乐 </n-radio-button>
+          <n-radio-button value="tencent"> QQ音乐 </n-radio-button>
+          <n-radio-button value="all"> 全部 </n-radio-button>
+        </n-radio-group>
+      </div>
     </div>
     <!-- 标签页 -->
     <n-tabs v-model:value="searchType" class="tabs" type="segment" @update:value="tabChange">
@@ -37,12 +45,27 @@ const searchKeyword = computed(() => router.currentRoute.value.query.keyword as 
 // 搜索分类
 const searchType = ref<string>((router.currentRoute.value?.name as string) || "search-songs");
 
+// 音乐源选择 - 优先使用URL参数，否则默认为"all"
+const musicSource = ref<string>((router.currentRoute.value.query.source as string) || "all");
+
 // Tabs 改变
 const tabChange = (value: string) => {
   router.push({
     name: value,
     query: {
       keyword: searchKeyword.value,
+      source: musicSource.value,
+    },
+  });
+};
+
+// 音乐源改变
+const sourceChange = (value: string) => {
+  router.push({
+    name: searchType.value,
+    query: {
+      keyword: searchKeyword.value,
+      source: value,
     },
   });
 };
@@ -50,6 +73,7 @@ const tabChange = (value: string) => {
 onBeforeRouteUpdate((to) => {
   if (to.matched[0].name !== "search") return;
   searchType.value = to.name as string;
+  musicSource.value = (to.query.source as string) || "all";
 });
 </script>
 
@@ -62,14 +86,21 @@ onBeforeRouteUpdate((to) => {
     margin-top: 12px;
     margin-bottom: 12px;
     font-size: 22px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
     .keyword {
       font-size: 36px;
       font-weight: bold;
-      margin-right: 8px;
       line-height: normal;
     }
     .n-text {
       display: inline-block;
+    }
+    .source-selector {
+      display: flex;
+      align-items: center;
     }
   }
   .router-view {

@@ -46,24 +46,37 @@ export const getPlayerInfo = (song?: SongType, sep: string = "/"): string | null
 /**
  * 获取在线播放链接
  * @param id 歌曲id
+ * @param songData 可选的歌曲数据，用于处理QQ音乐
  * @returns { url, isTrial } 播放链接与是否为试听
  */
 export const getOnlineUrl = async (
   id: number,
+  songData?: SongType,
 ): Promise<{ url: string | null; isTrial: boolean }> => {
   const settingStore = useSettingStore();
+
+  // 检查是否为QQ音乐歌曲
+  if (songData && songData.source === "tencent" && songData.originalUrl) {
+    console.log(`🎵 ${id} 使用QQ音乐播放链接`);
+    // 直接返回QQ音乐URL，不使用try-catch避免额外错误处理
+    const qqMusicUrl = songData.originalUrl;
+    console.log(`🌐 ${id} QQ music url:`, qqMusicUrl);
+    return { url: qqMusicUrl, isTrial: false };
+  }
+
+  // 默认使用网易云逻辑
   const res = await songUrl(id, settingStore.songLevel);
   console.log(`🌐 ${id} music data:`, res);
-  const songData = res.data?.[0];
+  const neteaseSongData = res.data?.[0];
   // 是否有播放地址
-  if (!songData || !songData?.url) return { url: null, isTrial: false };
+  if (!neteaseSongData || !neteaseSongData?.url) return { url: null, isTrial: false };
   // 是否仅能试听
-  const isTrial = songData?.freeTrialInfo !== null;
+  const isTrial = neteaseSongData?.freeTrialInfo !== null;
   // 返回歌曲地址
   // 客户端直接返回，网页端转 https, 并转换url以便解决音乐链接cors问题
   const normalizedUrl = isElectron
-    ? songData.url
-    : songData.url
+    ? neteaseSongData.url
+    : neteaseSongData.url
         .replace(/^http:/, "https:")
         .replace(/m804\.music\.126\.net/g, "m801.music.126.net")
         .replace(/m704\.music\.126\.net/g, "m701.music.126.net");

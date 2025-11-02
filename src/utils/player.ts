@@ -168,7 +168,7 @@ class Player {
       }
       const canUnlock = isElectron && nextSong.type !== "radio" && settingStore.useSongUnlock;
       // 先请求官方地址
-      const { url: officialUrl, isTrial } = await getOnlineUrl(songId);
+      const { url: officialUrl, isTrial } = await getOnlineUrl(songId, nextSong);
       if (officialUrl && !isTrial) {
         // 官方可播放且非试听
         this.nextPrefetch = { id: songId, url: officialUrl, ublock: false };
@@ -205,6 +205,7 @@ class Player {
     const settingStore = useSettingStore();
     // 播放信息
     const { id, path, type } = musicStore.playSong;
+    const currentSong = musicStore.playSong;
     const currentSessionId = this.playSessionId;
     // 检查会话是否过期
     if (currentSessionId !== this.playSessionId) {
@@ -236,7 +237,7 @@ class Player {
     // 自动播放
     if (autoPlay) await this.play();
     // 获取歌曲附加信息 - 非电台和本地
-    if (type !== "radio" && !path) getLyricData(id);
+    if (type !== "radio" && !path) getLyricData(id, currentSong);
     else resetSongLyric();
     // 定时获取状态
     if (!this.playerInterval) this.handlePlayStatus();
@@ -611,7 +612,7 @@ class Player {
         } else {
           // 官方地址失败或仅为试听时再尝试解锁（Electron 且非电台且开启解灰）
           const canUnlock = isElectron && type !== "radio" && settingStore.useSongUnlock;
-          const { url: officialUrl, isTrial } = await getOnlineUrl(songId);
+          const { url: officialUrl, isTrial } = await getOnlineUrl(songId, musicStore.playSong);
           if (officialUrl && !isTrial) {
             // 官方可播放且非试听
             statusStore.playUblock = false;

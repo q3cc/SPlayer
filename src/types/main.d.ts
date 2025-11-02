@@ -54,6 +54,11 @@ export type SongType = {
   playCount?: number;
   // 歌曲类型
   type: "song" | "radio";
+  // QQ音乐扩展字段
+  source?: "tencent" | "netease";
+  originalUrl?: string;  // 原始播放链接
+  originalLrc?: string;  // 原始歌词链接
+  originalPic?: string;  // 原始封面链接
 };
 
 // Cover

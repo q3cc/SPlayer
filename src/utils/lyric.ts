@@ -152,6 +152,11 @@ export const parseYrcData = (yrcData: LyricLine[], skipExclude: boolean = false)
   const yrcList = yrcData
     .map((line) => {
       const words = line.words;
+      // 安全检查：确保words存在且至少有一个元素
+      if (!words || words.length === 0 || !words[0]) {
+        console.warn("⚠️ parseYrcData: 无效的words数据", line);
+        return null;
+      }
       const time = msToS(words[0].startTime);
       const endTime = msToS(words[words.length - 1].endTime);
       const contents = words.map((word) => {
@@ -528,10 +533,22 @@ export const calculateLyricIndex = (
   // 逐字歌词（并发最多三句同时存在）：
   // - 计算在播放进度下处于激活区间的句子集合 activeIndices（[time, endTime)）
   // - 若激活数 >= 3，仅保留最后三句作为并发显示（允许三句同时有效）；否则保持最后两句
-  // - 索引取该并发集合中较早的一句（保持“上一句”高亮）
+  // - 索引取该并发集合中较早的一句（保持"上一句"高亮）
   // - 若无激活句：首句之前返回 -1；否则回退到最近一句
 
   const firstStart = lyrics[0]?.time ?? 0;
+
+  // 添加调试信息，特别是在第一行开始时
+  if (playSeek >= firstStart && playSeek < firstStart + 0.1) {
+    console.log(`🔍 歌词索引计算调试 - 第一行开始区域:`, {
+      当前播放时间: playSeek.toFixed(3),
+      第一行开始时间: firstStart.toFixed(3),
+      第一行结束时间: (lyrics[0]?.endTime ?? 'Infinity').toString(),
+      第一行内容: lyrics[0]?.content,
+      第一行逐字数量: lyrics[0]?.contents?.length || 0
+    });
+  }
+
   if (playSeek < firstStart) {
     return { index: -1, lyrics };
   }
@@ -545,10 +562,30 @@ export const calculateLyricIndex = (
     }
   }
 
+  // 添加激活索引调试信息
+  if (activeIndices.length > 0 && playSeek >= firstStart && playSeek < firstStart + 0.5) {
+    console.log(`🔍 激活歌词索引调试:`, {
+      当前播放时间: playSeek.toFixed(3),
+      激活索引: activeIndices,
+      激活歌词内容: activeIndices.map(i => lyrics[i]?.content)
+    });
+  }
+
   if (activeIndices.length === 0) {
     // 不在任何句子的区间里：退回到最近一句（按开始时间）
     const nextIdx = lyrics.findIndex((v) => (v?.time ?? 0) > playSeek);
     const index = nextIdx === -1 ? lyrics.length - 1 : nextIdx - 1;
+
+    // 如果在第一行附近但没有激活，特别处理
+    if (index === 0 && playSeek >= firstStart - 0.1 && playSeek < firstStart + 0.1) {
+      console.log(`🔧 第一行边界修正: 强制激活第一行`, {
+        当前时间: playSeek.toFixed(3),
+        第一行时间: firstStart.toFixed(3),
+        计算索引: index
+      });
+      return { index: 0, lyrics };
+    }
+
     return { index, lyrics };
   }
 
